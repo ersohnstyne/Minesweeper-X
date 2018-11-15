@@ -12,9 +12,9 @@ import com.ersohn.windows10.minesweeper.mode.Mode;
 import com.ersohn.windows10.minesweeper.resources.SplashGame;
 
 public class MinesweeperX {
-	//public static final MinesweeperX INSTANCE = new MinesweeperX();
-	
 	public static Mode currdifficultytype = Mode.EASY;
+	
+	public static String challengetype = "none";
 	
 	public static boolean getSound = false;
 	
