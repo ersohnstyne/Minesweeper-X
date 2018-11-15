@@ -100,7 +100,7 @@ public class Board {
 			time = new Timer(1000, timeAction);
 			time.start();
 		} else {
-			time.start();
+			if (status == Status.NONE) time.start();
 			timestop = false;
 		}
 	}
@@ -118,8 +118,8 @@ public class Board {
 		xside = MinesweeperX.horiz;
 		yside = MinesweeperX.vert;
 		
-		if (xside < 5) xside = 5;
-		if (yside < 5) yside = 5;
+		if (xside < 3) xside = 3;
+		if (yside < 3) yside = 3;
 		
 		if (editor) {
 			getsFirst = false;
@@ -261,8 +261,8 @@ public class Board {
 		xside = MinesweeperX.horiz;
 		yside = MinesweeperX.vert;
 		
-		if (xside < 5) xside = 5;
-		if (yside < 5) yside = 5;
+		if (xside < 3) xside = 3;
+		if (yside < 3) yside = 3;
 		
 		cellPanel = new JPanel(new GridLayout(xside, yside));
 		forEach(cell -> cellPanel.add(cell.getBtn()));
@@ -327,18 +327,6 @@ public class Board {
 		}
 	}
 	
-	/*private void resetCells() {
-		for(int l = 0; l<30; l++){
-			for(int i = 0; i<xside; i++){
-				for(int j = 0; j<yside; j++){
-					cells[i][j].setValue(0);
-				}
-			}
-			
-			setCellValues();
-		}
-	}*/
-	
 	/**This method starts chain reaction. When user click on particular cell, if cell is empty (value = 0) this
 	method look for other empty cells next to activated one. If finds one, it call checkCell and in effect,
 	start next scan on its closest area.
@@ -386,96 +374,6 @@ public class Board {
 		}
 	}
 	
-	/*private void checkfreemines(int y, int x) { // cells[x][y].isMine() && cells[x-1][y].isMine() && cells[x][y+1].isMine() && cells[x+1][y].isMine() && cells[x][y-1].isMine() && cells[x-1][y-1].isMine() && cells[x+1][y-1].isMine() && cells[x+1][y+1].isMine()
-		try {
-			while (cells[x][y].isMine()) moveMines(x, y);
-		} catch (IndexOutOfBoundsException xmax) {
-			//xmax.printStackTrace();
-		}
-		if (MinesweeperX.spaces >= 2) {
-			// Uses for one leftward
-			try {
-				while (cells[x-1][y].isMine()) moveMines(x-1, y);
-			} catch (IndexOutOfBoundsException xmax) {
-				//xmax.printStackTrace();
-			}
-		}
-		if (MinesweeperX.spaces >= 3) {
-			// Uses for one downward
-			try {
-				while (cells[x][y+1].isMine()) moveMines(x, y+1);
-			} catch (IndexOutOfBoundsException xmax) {
-				//xmax.printStackTrace();
-			}
-		}
-		if (MinesweeperX.spaces >= 4) {
-			// Uses for one rightward
-			try {
-				while (cells[x+1][y].isMine()) moveMines(x+1, y);
-			} catch (IndexOutOfBoundsException xmax) {
-				//xmax.printStackTrace();
-			}
-		}
-		if (MinesweeperX.spaces >= 5) {
-			// Uses for one upward
-			try {
-				while (cells[x][y-1].isMine()) moveMines(x, y-1);
-			} catch (IndexOutOfBoundsException xmax) {
-				//xmax.printStackTrace();
-			}
-		}
-		if (MinesweeperX.spaces >= 6) {
-			// Uses for one NW
-			try {
-				while (cells[x-1][y-1].isMine()) moveMines(x-1, y-1);
-			} catch (IndexOutOfBoundsException xmax) {
-				//xmax.printStackTrace();
-			}
-		}
-		if (MinesweeperX.spaces >= 7) {
-			// Uses for one NE
-			try {
-				while (cells[x+1][y-1].isMine()) moveMines(x+1, y-1);
-			} catch (IndexOutOfBoundsException xmax) {
-				//xmax.printStackTrace();
-			}
-		}
-		if (MinesweeperX.spaces >= 8) {
-			// Uses for one SE
-			try {
-				while (cells[x+1][y+1].isMine()) moveMines(x+1, y+1);
-			} catch (IndexOutOfBoundsException xmax) {
-				//xmax.printStackTrace();
-			}
-		}
-		if (MinesweeperX.spaces >= 9) {
-			// Uses for one SW
-			try {
-				while (cells[x-1][y+1].isMine()) moveMines(x-1, y+1);
-			} catch (IndexOutOfBoundsException xmax) {
-				//xmax.printStackTrace();
-			}
-		}
-	}
-	
-	private void moveMines(int x, int y) {
-		cells[x][y].removeMine();
-		
-		Random rx = new Random();
-		Random ry = new Random();
-		
-		int rxval = rx.nextInt(xside-1);
-		int ryval = ry.nextInt(yside-1);
-		
-		while (cells[rxval][ryval].isMine()) {
-			rxval = rx.nextInt(xside-1);
-			ryval = ry.nextInt(yside-1);
-		}
-		
-		cells[rxval][ryval].setMine();
-		
-	}*/
-	
 	/**Multiclick is impressive, but may only use by Detector.
 	 */
 	public boolean multiclick(int x, int y) {
@@ -503,8 +401,7 @@ public class Board {
 		}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
-		if (numflag < nummines) { return false; }
-		if (numflag > nummines) { return false; }
+		if (numflag != nummines) { return false; }
 		
 		// Reveal mode
 		// Left bar
@@ -542,71 +439,72 @@ public class Board {
 	}
 	
 	public void explosion(){
-		if (doOnceStatus) { doOnceStatus = false;
-		MinesweeperX.clickExplodeCount++;
-		wExploding.setText("Times exploded: " + MinesweeperX.clickExplodeCount);
-		if (MinesweeperX.getSound) {
+		if (doOnceStatus) {
+			doOnceStatus = false;
+			MinesweeperX.clickExplodeCount++;
+			wExploding.setText("Times exploded: " + MinesweeperX.clickExplodeCount);
+			if (MinesweeperX.getSound) {
+				
+				snd.run();
+				//try {Thread.sleep(10 + random.nextInt(40));} catch (InterruptedException xnosmooth) {}
+			}
 			
-			snd.run();
-			//try {Thread.sleep(10 + random.nextInt(40));} catch (InterruptedException xnosmooth) {}
-		}
-		
-		for(Cell[] a : cells){
-			for(Cell b : a){
-				if (b.isMine()) {
-					stopTimer();
-					if (!b.getExplosion())
-						b.reveal(Color.RED);
-					
-					if (b.getBtn().getText().equals(b.flagicon))
-						foundmines = b.incrementNumber(foundmines);
-				} else if (b.isChecked()) {
-					b.getBtn().setBackground(Color.BLUE);
-					b.getBtn().setEnabled(false);
-					if (b.getBtn().getText().equals(b.flagicon)) b.getBtn().setBackground(Color.CYAN);
+			for(Cell[] a : cells){
+				for(Cell b : a){
+					if (b.isMine()) {
+						stopTimer();
+						if (!b.getExplosion())
+							b.reveal(Color.RED);
+							
+						if (b.getBtn().getText().equals(b.flagicon))
+							foundmines = b.incrementNumber(foundmines);
+					} else if (b.isChecked()) {
+						b.getBtn().setBackground(Color.BLUE);
+						b.getBtn().setEnabled(false);
+						if (b.getBtn().getText().equals(b.flagicon)) b.getBtn().setBackground(Color.CYAN);
+					}
 				}
 			}
-		}
-		stopTimer();
-		timestop = true;
-		status = Status.EXPLODED;
-		showDialog();
+			stopTimer();
+			status = Status.EXPLODED;
+			showDialog();
 		}
 	}
 	
 	public void finish() {
-		if (doOnceStatus) { doOnceStatus = false;
-		MinesweeperX.nonExplodingCount++;
-		nonExploding.setText("All open w/o explosion: " + MinesweeperX.nonExplodingCount);
-		
-		amountLabel.setText("Amount: 0");
-		timestop = true;
-		
-		if (totaltime < MinesweeperX.hsTime) {
-			if (!EDITOR_MODE) {
-				MinesweeperX.hsTime = totaltime;
-				MinesweeperX.submitHs(MinesweeperX.hsTime);
-				
-				// XXX Set this text to highscore
-				hsLabel.setText("Best time: " + MinesweeperX.hsTime);
-			}
-		}
-		
-		for(Cell[] a : cells){
-			for(Cell b : a){
-				if (b.isMine()) {
-					stopTimer();
-					b.getBtn().setEnabled(false);
-					b.getBtn().setBackground(Color.GREEN);
-					b.getBtn().setText(b.flagicon);
-				} else if (b.isChecked()) {
-					b.getBtn().setEnabled(false);
+		if (doOnceStatus) {
+			doOnceStatus = false;
+			MinesweeperX.nonExplodingCount++;
+			nonExploding.setText("All open w/o explosion: " + MinesweeperX.nonExplodingCount);
+			
+			amountLabel.setText("Amount: 0");
+			
+			if (totaltime < MinesweeperX.hsTime) {
+				if (!EDITOR_MODE) {
+					MinesweeperX.hsTime = totaltime;
+					MinesweeperX.submitHs(MinesweeperX.hsTime);
+					
+					// XXX Set this text to highscore
+					hsLabel.setText("Best time: " + MinesweeperX.hsTime);
 				}
 			}
-		}
-		
-		status = Status.NONEXPLODING;
-		showDialog();
+			
+			for(Cell[] a : cells){
+				for(Cell b : a){
+					if (b.isMine()) {
+						stopTimer();
+						b.getBtn().setEnabled(false);
+						b.getBtn().setBackground(Color.GREEN);
+						b.getBtn().setText(b.flagicon);
+					} else if (b.isChecked()) {
+						b.getBtn().setEnabled(false);
+					}
+				}
+			}
+			
+			stopTimer();
+			status = Status.NONEXPLODING;
+			showDialog();
 		}
 	}
 	
@@ -616,6 +514,7 @@ public class Board {
 		case EXPLODED: JOptionPane.showMessageDialog(brdframe, "You have found " + foundmines + (foundmines == 1 ? " Mine" : " Mines"), "EXPLODED!", JOptionPane.ERROR_MESSAGE); break;
 		default: break;
 		}
+		stopTimer();
 	}
 	
 	private void forEach(Consumer<Cell> consumer) {
