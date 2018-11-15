@@ -1,279 +1,323 @@
-package com.ersohn.windows10.minesweeper;
+package com.ersohn.windows10.minesweeper.board;
 
-import java.io.IOException;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.naming.CannotProceedException;
-import javax.swing.SwingUtilities;
+import javax.swing.JButton;
 
-import com.ersohn.windows10.minesweeper.board.*;
-import com.ersohn.windows10.minesweeper.general.ProgramConstants;
-import com.ersohn.windows10.minesweeper.io.Highscore;
-import com.ersohn.windows10.minesweeper.mode.Mode;
-import com.ersohn.windows10.minesweeper.resources.SplashGame;
+import com.ersohn.windows10.minesweeper.*;
 
-public class MinesweeperX {
-	public static Mode currdifficultytype = Mode.EASY;
+public class Cell implements ActionListener {
+	public int xlocation;
+	public int ylocation;
 	
-	public static String challengetype = "none";
+	private boolean multipleclick = false;
+	private boolean radararea = false;
 	
-	public static boolean getSound = false;
+	private JButton btn;
+	private Board brd;
+	private boolean ready;
+	private int value;
+	private int id;
 	
-	public static boolean getFlag = false;
-	private static int numFlags = 0;
+	private boolean unicodes = true;
 	
-	public static int horiz = 9;
-	public static int vert = 9;
-	public static int totmines = 10;
+	public String flagicon = unicodes ? "\u2691" : "P"; // true = Real Flag; false = Flag with P
+	private boolean explodeOnClick = false;
 	
-	// Highscores
-	private static Highscore hs;
-	public static int hsTime = 360000;
-	public static String username = System.getProperty("user.name");
-	public static String datapath = System.getProperty("user.home") + "\\Documents\\PennyGames Development";
+	SoundEffect snd;
 	
-	// Stats
-	public static int nonExplodingCount;
-	public static int clickExplodeCount;
+	public void setOrRemoveFlag() {
+		if (btn.getText().equals(flagicon)) {
+			MinesweeperX.changeamount(1);
+			btn.setText("");
+		} else {
+			MinesweeperX.changeamount(-1);
+			btn.setText(flagicon);
+		}
+	}
 	
-	public static int spaces;
+	public void setLocation(int x, int y) {
+		this.xlocation = x;
+		this.ylocation = y;
+	}
 	
-	public static void main(String[] services) {
-		System.out.println(datapath);
+	public int getLocation(String c) {
+		switch (c) {
+			case "x": return xlocation;
+			case "y": return ylocation;
+			default: return 0;
+		}
+	}
+	
+	public Cell(Board b) {
+		btn = new JButton(); 
+		ready = true;
 		
-		try {
-			if (services[0].contains("-h") || services[0].contains("--help")) {
-				System.out.println(
-						  "Usage: java -jar minesweeper-x.jar (" + ProgramConstants.TITLE + ") [options ...]\n"
-						+ "-h  --help\tShow parameters\n"
-						+ "-s  --sound\tLaunch application with sounds (similar like an Unity Game)\n"
-						+ "-b  --board\tGenerate board (-b HEIGHT WIDTH MINES; Default is 9 mines.)\n"
-						);
+		multipleclick = false;
+		
+		btn.addActionListener(this);
+		btn.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if (arg0.getButton() == MouseEvent.BUTTON3 && !MinesweeperX.challengetype.equals("lmb")) {
+					if (btn.getText().equals(flagicon)) {
+						MinesweeperX.changeamount(1);
+						btn.setText("");
+					} else {
+						if (btn.isEnabled()) {
+							MinesweeperX.changeamount(-1);
+							btn.setText(flagicon);
+						}
+					}
+					multipleclick = false;
+				} else if (arg0.getButton() == MouseEvent.BUTTON2 && !MinesweeperX.challengetype.equals("lmb")) {
+					radararea = false;
+					if (brd.allowMulticlick)
+						brd.multiclick(ylocation, xlocation);
+					/*if (!btn.getText().equals(flagicon) && !radararea) {
+						checkCell();
+					}*/
+				} else if (arg0.getButton() == MouseEvent.BUTTON1) {
+					radararea = false;
+					if (btn.getText().equals(flagicon) && !radararea) {
+						checkCell();
+					}
+					if (multipleclick && !MinesweeperX.challengetype.equals("lmb")) {
+						if (checkForSpaces()) {
+							if (brd.allowMulticlick)
+								brd.multiclick(ylocation, xlocation);
+						}
+					}
+				}
+				
+				brd.updateRequiredAmount();
 			}
-			if (services[0].contains("-s") || services[0].contains("--sound")) {
-				try {
-					SplashGame sg = new SplashGame();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				getSound = true;
-				SwingUtilities.invokeLater(() -> new Board(false).setBoard());
+			
+			public boolean checkForSpaces() {
+				return !btn.getText().equals(flagicon) && !isMine();
 			}
-			if (services[0].contains("-b") || services[0].contains("--board")) {
-				int custommines = 9;
-				int customwidth = 0;
-				int customheight = 0;
-				
-				try {
-					try {
-						customwidth = Integer.parseInt(services[1]);
-						if (customwidth < 5) {System.out.println("Value width too small");}
-					} catch (NumberFormatException xwidth) {
-						System.out.println("That is not a number of width"); return;
-					}
-				} catch (IndexOutOfBoundsException xnowidth) {
-					System.out.println("Option for width required"); return;
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3 && !MinesweeperX.challengetype.equals("lmb")) {
+					multipleclick = true;
 				}
 				
-				try {
-					try {
-						customheight = Integer.parseInt(services[2]);
-						if (customheight < 5) {System.out.println("Value height too small");}
-					} catch (NumberFormatException xheight) {
-						System.out.println("That is not a number of height"); return;
-					}
-				} catch (IndexOutOfBoundsException xnoheight) {
-					System.out.println("Option for height required");
-				}
-				
-				try {
-					try {
-						custommines = Integer.parseInt(services[3]);
-						if (custommines < 9) {System.out.println("Value mines too small");}
-					} catch (NumberFormatException xmines) {
-						System.out.println("That is not a number of mines"); return;
-					}
-				} catch (IndexOutOfBoundsException xnoheight) {
-					
-				}
-				
-				try {
-					SplashGame sg = new SplashGame();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				Board brd = new Board(false);
-				brd.setBoard();
-				
-				try {
-					currdifficultytype = Mode.CUSTOM;
-					brd.setCustom(customwidth, customheight, custommines);
-				} catch (CannotProceedException xnogenerated) {
-					System.out.println(xnogenerated); return;
-				}
-			}
-		} catch (Exception xnoparam) {
-			switch (currdifficultytype) {
-				case EASY: {
-					hs = new Highscore(ProgramConstants.NAME, Mode.EASY);
-					try {
-						hsTime = hs.getHighscore();
-					} catch (ClassNotFoundException | IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
-				}
-				case MEDIUM: {
-					hs = new Highscore(ProgramConstants.NAME, Mode.MEDIUM);
-					try {
-						hsTime = hs.getHighscore();
-					} catch (ClassNotFoundException | IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
-				}
-				case HARD: {
-					hs = new Highscore(ProgramConstants.NAME, Mode.HARD);
-					try {
-						hsTime = hs.getHighscore();
-					} catch (ClassNotFoundException | IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
-				}
-				default: {
-					break;
+				if (multipleclick) {
+					radararea = true;
 				}
 			}
 			
-			try {
-				SplashGame sg = new SplashGame();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3 && !MinesweeperX.challengetype.equals("lmb")) {
+					multipleclick = false;
+				}
+				
+				if (multipleclick) {
+					radararea = false;
+				}
+			}
+		});
+		btn.setText("");
+		btn.setPreferredSize(new Dimension(8,8));
+		btn.setMargin(new Insets(0,0,0,0));
+		this.brd = b;
+	}
+	
+	public JButton getBtn() {
+		return btn;
+	}
+	
+	public int getValue() {
+		return value;
+	}
+	
+	public int getID() {
+		return id;
+	}
+	
+	public void setValue(int value) {
+		this.value = value;
+	}
+	
+	public void setID(int id) {
+		this.id = id;
+	}
+	
+	public void displayValue(Color c) {
+		if (isMine()) {
+			if (!btn.getText().equals("P") && !btn.getText().equals("\u2691")) {
+				btn.setText("\u2600");
+				btn.setBackground(c);
+			} else if (isMine()) {
+				btn.setBackground(Color.GREEN);
+			} else {
+				btn.setBackground(Color.YELLOW);
+			}
+		} else if(value!=0) {
+			for (int i = 0; i < 1000; i++) {
+				btn.setText(String.valueOf(value));
+			}
+		}
+	}
+	
+	public int incrementNumber(int currentnumber) {
+		int current = currentnumber; current++;
+		return current;
+	}
+	
+	public boolean getExplosion() {
+		return explodeOnClick;
+	}
+	
+	public void checkCell() {
+		if (getBtn().getText().equals(flagicon)) return;
+		
+		if (btn.isEnabled()) {
+			brd.getsFirst = false;
+			MinesweeperX.decrementSpaces();
+			
+			if (MinesweeperX.spaces < 0) {
+				brd.reset();
 			}
 			
-			SwingUtilities.invokeLater(() -> new Board(false).setBoard());
+			while (isMine() && brd.timestop) {
+				brd.reset();
+			}
+			
+			brd.allowMulticlick = true;
+			
+			if (brd.timestop) {
+				brd.startTimer();
+			}
+			
+			if (isMine() || brd.isDone()) {
+				explodeOnClick = true;
+				reveal(Color.MAGENTA);
+				if (isMine()) {
+					MinesweeperX.spaces++;
+					brd.stopTimer();
+					brd.explosion();
+				}
+			} else if (value == 0) {
+				reveal(Color.BLACK);
+				brd.scanForEmptyCells(xlocation, ylocation);
+			} else {
+				reveal(Color.BLACK);
+			}
+			
+			brd.startTimer();
+			
+			System.out.println("Remaining cells: " + MinesweeperX.spaces);
+			
+			if (MinesweeperX.spaces < 1) {
+				brd.finish();
+			}
+			
+			
 		}
 	}
 	
-	public static void submitHs(int time) {
-		hsTime = time;
-		switch (currdifficultytype) {
-		case EASY: {
-			try {
-				if (hs == null) hs = new Highscore(ProgramConstants.NAME, Mode.EASY);
-				hs.setHighScore(time);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
+	public void openLotSpaces() {
+		if (btn.isEnabled()) {
+			MinesweeperX.decrementSpaces();
+			reveal(Color.BLACK);
+			if (value == 0) {
+				brd.scanForEmptyCells(xlocation, ylocation);
 			}
-			break;
-		}
-		case MEDIUM: {
-			try {
-				if (hs == null) hs = new Highscore(ProgramConstants.NAME, Mode.MEDIUM);
-				hs.setHighScore(time);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			}
-			break;
-		}
-		case HARD: {
-			try {
-				if (hs == null) hs = new Highscore(ProgramConstants.NAME, Mode.HARD);
-				hs.setHighScore(time);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			}
-			break;
-		}
-		default:
-			break;
 		}
 	}
 	
-	public static void updateDifficulty(int horizontal, int vertical, int mines, Mode difficultytype) {
-		horiz = horizontal;
-		vert = vertical;
-		totmines = mines;
+	public void incrementValue(){
+		value++;
+	}
+	
+	public void resetValue() {
+		value = 0;
+	}
+	
+	public boolean isChecked(){
+		return ready;
+	}
+	
+	public boolean isEmpty(){
+		return isChecked() && value==0 /*|| value==1 || value==2 || value==3 || value==4 || value==5 || value==6 || value==7 || value==8*/;
+	}
+	
+	public void reveal(Color c) {
+		displayValue(c);
+		ready = false;
+		btn.setEnabled(false);
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		/*if (brd.timestop)
+			brd.setCellValues();*/
 		
-		currdifficultytype = difficultytype;
+		if (btn.getText().equals(flagicon)) return;
 		
-		hsTime = 360000;
+		while (value != 0 && brd.timestop && MinesweeperX.spaces >= 8) {
+			brd.reset();
+		}
 		
-		switch (difficultytype) {
-		case EASY: {
-			if (hs != null) {hs.deinitialize(); hs = null;}
-			hs = new Highscore(ProgramConstants.NAME, Mode.EASY);
-			try {
-				hsTime = hs.getHighscore();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
+		if (!btn.getText().equals(flagicon)) {
+			if (multipleclick) {
+				boolean multiple = brd.multiclick(ylocation, xlocation);
+				if (multiple && brd.allowMulticlick)
+					checkCell();
 			}
-			break;
-		}
-		case MEDIUM:  {
-			if (hs != null) {hs.deinitialize(); hs = null;}
-			hs = new Highscore(ProgramConstants.NAME, Mode.MEDIUM);
-			try {
-				hsTime = hs.getHighscore();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
+			else {
+				if (value == 0) {
+					if (MinesweeperX.getSound) {
+						snd = new SoundEffect("openspaces.wav");
+						if (value == 0) snd.run();
+					}
+				}
+				
+				checkCell();
 			}
-			break;
 		}
-		case HARD: {
-			if (hs != null) {hs.deinitialize(); hs = null;}
-			hs = new Highscore(ProgramConstants.NAME, Mode.HARD);
-			try {
-				hsTime = hs.getHighscore();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			}
-			break;
-		}
-		default: {
-			if (hs != null) {hs.deinitialize(); hs = null;}
-			break;
-		}
-		}
-		SwingUtilities.invokeLater(() -> new Board(false).setBoard());
+		brd.updateRequiredAmount();
 	}
 	
-	public static void decrementSpaces() {
-		spaces--;
+	public int setMine() {
+		if (!isMine()) {
+			setValue(-1);
+			return 1;
+		}
+		return 0;
 	}
 	
-	public static void changeamount(int numberofflags) {
-		numFlags -= numberofflags;
+	public void removeMine() {
+		if (isMine()) {
+			setValue(0);
+		}
 	}
 	
-	public static void resetamount() {
-		numFlags = 0;
+	public boolean isMine() {
+		return value == -1;
 	}
 	
-	public static int getRequiredMines() {
-		return totmines - numFlags;
+	public void reset() {
+		brd.getsFirst = true;
+		explodeOnClick = false;
+		
+		if (MinesweeperX.getSound)
+			try { snd.removeClip(); } catch (NullPointerException xnoValue) {}
+		
+		setValue(0);
+		btn.setText("");
+		btn.setBackground(null);
+		ready = true;
+		btn.setEnabled(ready);
 	}
 }
