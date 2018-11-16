@@ -53,7 +53,6 @@ public class MinesweeperX {
 				try {
 					SplashGame sg = new SplashGame();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
@@ -68,12 +67,14 @@ public class MinesweeperX {
 				try {
 					try {
 						customwidth = Integer.parseInt(services[1]);
-						if (customwidth < 5) {System.out.println("Value width too small");}
+						if (customwidth < 5) {System.err.println("Value width too small");}
 					} catch (NumberFormatException xwidth) {
-						System.out.println("That is not a number of width"); return;
+						System.err.println("That is not a number of width");
+						return;
 					}
 				} catch (IndexOutOfBoundsException xnowidth) {
-					System.out.println("Option for width required"); return;
+					System.err.println("Option for width required");
+					return;
 				}
 				
 				try {
@@ -81,18 +82,21 @@ public class MinesweeperX {
 						customheight = Integer.parseInt(services[2]);
 						if (customheight < 5) {System.out.println("Value height too small");}
 					} catch (NumberFormatException xheight) {
-						System.out.println("That is not a number of height"); return;
+						System.err.println("That is not a number of height");
+						return;
 					}
 				} catch (IndexOutOfBoundsException xnoheight) {
-					System.out.println("Option for height required");
+					System.err.println("Option for height required");
+					return;
 				}
 				
 				try {
 					try {
 						custommines = Integer.parseInt(services[3]);
-						if (custommines < 9) {System.out.println("Value mines too small");}
+						if (custommines < 9) {System.err.println("Value mines too small");}
 					} catch (NumberFormatException xmines) {
-						System.out.println("That is not a number of mines"); return;
+						System.err.println("That is not a number of mines");
+						return;
 					}
 				} catch (IndexOutOfBoundsException xnoheight) {
 					
@@ -101,7 +105,6 @@ public class MinesweeperX {
 				try {
 					SplashGame sg = new SplashGame();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
@@ -122,7 +125,6 @@ public class MinesweeperX {
 					try {
 						hsTime = hs.getHighscore();
 					} catch (ClassNotFoundException | IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					break;
@@ -132,7 +134,6 @@ public class MinesweeperX {
 					try {
 						hsTime = hs.getHighscore();
 					} catch (ClassNotFoundException | IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					break;
@@ -142,7 +143,6 @@ public class MinesweeperX {
 					try {
 						hsTime = hs.getHighscore();
 					} catch (ClassNotFoundException | IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					break;
@@ -155,7 +155,6 @@ public class MinesweeperX {
 			try {
 				SplashGame sg = new SplashGame();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -171,7 +170,6 @@ public class MinesweeperX {
 				if (hs == null) hs = new Highscore(ProgramConstants.NAME, Mode.EASY);
 				hs.setHighScore(time);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			}
 			break;
@@ -181,7 +179,6 @@ public class MinesweeperX {
 				if (hs == null) hs = new Highscore(ProgramConstants.NAME, Mode.MEDIUM);
 				hs.setHighScore(time);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			}
 			break;
@@ -191,7 +188,6 @@ public class MinesweeperX {
 				if (hs == null) hs = new Highscore(ProgramConstants.NAME, Mode.HARD);
 				hs.setHighScore(time);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			}
 			break;
@@ -217,10 +213,8 @@ public class MinesweeperX {
 			try {
 				hsTime = hs.getHighscore();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			}
 			break;
@@ -231,10 +225,8 @@ public class MinesweeperX {
 			try {
 				hsTime = hs.getHighscore();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			}
 			break;
@@ -245,10 +237,8 @@ public class MinesweeperX {
 			try {
 				hsTime = hs.getHighscore();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			}
 			break;
