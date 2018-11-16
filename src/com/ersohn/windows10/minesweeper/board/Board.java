@@ -46,7 +46,7 @@ public class Board {
 	public boolean allowMulticlick = false;
 	
 	public boolean getsFirst = true;
-	private Status status;
+	public Status status;
 	
 	public int foundmines = 0;
 	public boolean doOnceStatus = true;
@@ -279,7 +279,15 @@ public class Board {
 		Random random = new Random();
 		int counter = 0;
 		while (counter != MINES) {
-			counter += cells[random.nextInt(MinesweeperX.horiz)][random.nextInt(MinesweeperX.vert)].setMine();
+			int xloc = random.nextInt(MinesweeperX.horiz);
+			int yloc = random.nextInt(MinesweeperX.vert);
+			
+			while (cells[xloc][yloc].isMine()) {
+				xloc = random.nextInt(MinesweeperX.horiz);
+				yloc = random.nextInt(MinesweeperX.vert);
+			}
+			
+			counter += cells[xloc][yloc].setMine();
 		}
 		MinesweeperX.spaces = (MinesweeperX.horiz * MinesweeperX.vert - counter);
 	}
@@ -527,7 +535,7 @@ public class Board {
 		
 		if (!EDITOR_MODE) {
 			plantMines();
-			setCellValues();
+			//setCellValues();
 		}
 	}
 	
