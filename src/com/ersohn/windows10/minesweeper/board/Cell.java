@@ -60,8 +60,8 @@ public class Cell implements ActionListener {
 		btn.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if (arg0.getButton() == MouseEvent.BUTTON3 && !MinesweeperX.challengetype.equals("lmb")) {
-					if (btn.getText().equals(flagicon)) {
+				if (arg0.getButton() == MouseEvent.BUTTON3 && (!MinesweeperX.challengetype.equals("lmb") || MinesweeperX.challengetype.equals("rmb")) && !brd.timestop) {
+					if (btn.getText().equals(flagicon) && brd.status == Status.NONE) {
 						MinesweeperX.changeamount(1);
 						btn.setText("");
 					} else {
@@ -70,11 +70,12 @@ public class Cell implements ActionListener {
 							btn.setText(flagicon);
 						}
 					}
+					
 					multipleclick = false;
-				} else if (arg0.getButton() == MouseEvent.BUTTON2 && !MinesweeperX.challengetype.equals("lmb")) {
+				} else if (arg0.getButton() == MouseEvent.BUTTON2 && (!MinesweeperX.challengetype.equals("lmb"))) {
 					radararea = false;
 					if (brd.allowMulticlick)
-						brd.multiclick(ylocation, xlocation);
+						multiclick(ylocation, xlocation);
 					/*if (!btn.getText().equals(flagicon) && !radararea) {
 						checkCell();
 					}*/
@@ -86,7 +87,7 @@ public class Cell implements ActionListener {
 					if (multipleclick && !MinesweeperX.challengetype.equals("lmb")) {
 						if (checkForSpaces()) {
 							if (brd.allowMulticlick)
-								brd.multiclick(ylocation, xlocation);
+								multiclick(ylocation, xlocation);
 						}
 					}
 				}
@@ -130,6 +131,10 @@ public class Cell implements ActionListener {
 		btn.setPreferredSize(new Dimension(8,8));
 		btn.setMargin(new Insets(0,0,0,0));
 		this.brd = b;
+	}
+	
+	public void multiclick(int y, int x) {
+		brd.multiclick(y, x);
 	}
 	
 	public JButton getBtn() {
@@ -183,21 +188,21 @@ public class Cell implements ActionListener {
 		
 		if (btn.isEnabled()) {
 			brd.getsFirst = false;
-			MinesweeperX.decrementSpaces();
 			
 			if (MinesweeperX.spaces < 0) {
 				brd.reset();
 			}
 			
-			while (isMine() && brd.timestop) {
-				brd.reset();
+			if (brd.timestop) {
+				brd.setCellValues();
+				while (isMine() || value > 0 && MinesweeperX.spaces > 8) {
+					brd.reset();
+					brd.setCellValues();
+				}
+				brd.startTimer();
 			}
 			
 			brd.allowMulticlick = true;
-			
-			if (brd.timestop) {
-				brd.startTimer();
-			}
 			
 			if (isMine() || brd.isDone()) {
 				explodeOnClick = true;
@@ -215,19 +220,16 @@ public class Cell implements ActionListener {
 			}
 			
 			brd.startTimer();
-			
-			System.out.println("Remaining cells: " + MinesweeperX.spaces);
-			
-			if (MinesweeperX.spaces < 1) {
-				brd.finish();
-			}
-			
-			
+			MinesweeperX.decrementSpaces();
+		}
+		
+		if (MinesweeperX.spaces < 1) {
+			brd.finish();
 		}
 	}
 	
 	public void openLotSpaces() {
-		if (btn.isEnabled()) {
+		if (btn.isEnabled() && !btn.getText().equals(flagicon)) {
 			MinesweeperX.decrementSpaces();
 			reveal(Color.BLACK);
 			if (value == 0) {
@@ -260,9 +262,6 @@ public class Cell implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		/*if (brd.timestop)
-			brd.setCellValues();*/
-		
 		if (btn.getText().equals(flagicon)) return;
 		
 		while (value != 0 && brd.timestop && MinesweeperX.spaces >= 8) {
