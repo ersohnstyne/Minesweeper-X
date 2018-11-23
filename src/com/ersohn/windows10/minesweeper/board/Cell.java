@@ -22,18 +22,21 @@ public class Cell implements ActionListener {
 	
 	private boolean unicodes = true;
 	
+	public boolean mineflag = false;
 	public String flagicon = unicodes ? "\u2691" : "P"; // true = Real Flag; false = Flag with P
 	private boolean explodeOnClick = false;
 	
 	SoundEffect snd;
 	
 	public void setOrRemoveFlag() {
-		if (btn.getText().equals(flagicon)) {
+		if (mineflag) {
 			MinesweeperX.changeamount(1);
 			btn.setText("");
+			mineflag = false;
 		} else {
 			MinesweeperX.changeamount(-1);
 			btn.setText(flagicon);
+			mineflag = true;
 		}
 	}
 	
@@ -60,25 +63,26 @@ public class Cell implements ActionListener {
 		btn.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if (arg0.getButton() == MouseEvent.BUTTON3 && (!MinesweeperX.challengetype.equals("lmb") || MinesweeperX.challengetype.equals("rmb")) && !brd.timestop) {
-					if (btn.getText().equals(flagicon) && brd.status == Status.NONE) {
-						MinesweeperX.changeamount(1);
-						btn.setText("");
-					} else {
-						if (btn.isEnabled()) {
-							MinesweeperX.changeamount(-1);
-							btn.setText(flagicon);
+				if (arg0.getButton() == MouseEvent.BUTTON3 && /*(!MinesweeperX.challengetype.equals("lmb") || MinesweeperX.challengetype.equals("rmb")) &&*/ !brd.timestop) {
+					if (brd.status == Status.NONE) {
+						if (mineflag) {
+							MinesweeperX.changeamount(1);
+							btn.setText("");
+							mineflag = false;
+						} else {
+							if (btn.isEnabled()) {
+								MinesweeperX.changeamount(-1);
+								btn.setText(flagicon);
+								mineflag = true;
+							}
 						}
 					}
 					
 					multipleclick = false;
-				} else if (arg0.getButton() == MouseEvent.BUTTON2 && (!MinesweeperX.challengetype.equals("lmb"))) {
+				} else if (arg0.getButton() == MouseEvent.BUTTON2 /*&& (!MinesweeperX.challengetype.equals("lmb"))*/) {
 					radararea = false;
 					if (brd.allowMulticlick)
 						multiclick(ylocation, xlocation);
-					/*if (!btn.getText().equals(flagicon) && !radararea) {
-						checkCell();
-					}*/
 				} else if (arg0.getButton() == MouseEvent.BUTTON1) {
 					radararea = false;
 					if (btn.getText().equals(flagicon) && !radararea) {
@@ -193,12 +197,23 @@ public class Cell implements ActionListener {
 				brd.reset();
 			}
 			
-			if (brd.timestop) {
+			if (brd.timestop && !brd.EDITOR_MODE) {
+				int totalattempt = 0;
+				boolean doThis = value != 0 || isMine() && MinesweeperX.spaces > 7;
+				//brd.moveMines(xlocation, ylocation);
+				//brd.resetValues();
+				brd.plantMines(xlocation, ylocation);
 				brd.setCellValues();
-				while (isMine() || value > 0 && MinesweeperX.spaces > 8) {
+				while (doThis || value != 0 && totalattempt < 100000) {
 					brd.reset();
+					brd.plantMines(xlocation, ylocation);
 					brd.setCellValues();
+					doThis = value != 0 && MinesweeperX.spaces > 8;
+					totalattempt++;
 				}
+				brd.startTimer();
+			} else if (brd.timestop) {
+				brd.setCellValues();
 				brd.startTimer();
 			}
 			
@@ -217,6 +232,9 @@ public class Cell implements ActionListener {
 				brd.scanForEmptyCells(xlocation, ylocation);
 			} else {
 				reveal(Color.BLACK);
+				if (value == 0) {
+					brd.scanForEmptyCells(xlocation, ylocation);
+				}
 			}
 			
 			brd.startTimer();
@@ -276,10 +294,10 @@ public class Cell implements ActionListener {
 			}
 			else {
 				if (value == 0) {
-					if (MinesweeperX.getSound) {
+					/*if (MinesweeperX.getSound) {
 						snd = new SoundEffect("openspaces.wav");
 						if (value == 0) snd.run();
-					}
+					}*/
 				}
 				
 				checkCell();
@@ -309,6 +327,7 @@ public class Cell implements ActionListener {
 	public void reset() {
 		brd.getsFirst = true;
 		explodeOnClick = false;
+		mineflag = false;
 		
 		if (MinesweeperX.getSound)
 			try { snd.removeClip(); } catch (NullPointerException xnoValue) {}
