@@ -46,7 +46,7 @@ public class Board {
 	public boolean allowMulticlick = false;
 	
 	public boolean getsFirst = true;
-	public Status status;
+	public Status status = Status.NONE;
 	
 	public int foundmines = 0;
 	public boolean doOnceStatus = true;
@@ -209,7 +209,6 @@ public class Board {
 			try {
 				setEasy();
 			} catch (ClassNotFoundException | IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		});
@@ -218,7 +217,6 @@ public class Board {
 			try {
 				setMed();
 			} catch (ClassNotFoundException | IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		});
@@ -227,7 +225,6 @@ public class Board {
 			try {
 				setHard();
 			} catch (ClassNotFoundException | IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		});
@@ -269,7 +266,7 @@ public class Board {
 		return cellPanel;
 	}
 
-	public void plantMines(){
+	public void plantMines(int ylocation, int xlocation){
 		if (MinesweeperX.getSound) {
 			Random randomsnd = new Random();
 			String[] boomsnd = {"explode1.wav", "explode2.wav", "explode3.wav", "explode4.wav"};
@@ -283,6 +280,45 @@ public class Board {
 			int yloc = random.nextInt(MinesweeperX.vert);
 			
 			while (cells[xloc][yloc].isMine()) {
+				xloc = random.nextInt(MinesweeperX.horiz);
+				yloc = random.nextInt(MinesweeperX.vert);
+			}
+			
+			// Horizontal and verticals
+			while (xloc-1 == xlocation-1 && MinesweeperX.spaces > 1) {
+				xloc = random.nextInt(MinesweeperX.horiz);
+				yloc = random.nextInt(MinesweeperX.vert);
+			}
+			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && MinesweeperX.spaces > 2) {
+				xloc = random.nextInt(MinesweeperX.horiz);
+				yloc = random.nextInt(MinesweeperX.vert);
+			}
+			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && MinesweeperX.spaces > 3) {
+				xloc = random.nextInt(MinesweeperX.horiz);
+				yloc = random.nextInt(MinesweeperX.vert);
+			}
+			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && yloc+1 == ylocation+1 && MinesweeperX.spaces > 4) {
+				xloc = random.nextInt(MinesweeperX.horiz);
+				yloc = random.nextInt(MinesweeperX.vert);
+			}
+			
+			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && yloc+1 == ylocation+1 &&
+					xloc-1 == xlocation-1 && yloc-1 == ylocation-1 && MinesweeperX.spaces > 5) {
+				xloc = random.nextInt(MinesweeperX.horiz);
+				yloc = random.nextInt(MinesweeperX.vert);
+			}
+			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && yloc+1 == ylocation+1 &&
+					xloc-1 == xlocation-1 && yloc-1 == ylocation-1 && xloc+1 == xlocation+1 && yloc+1 == ylocation+1 && MinesweeperX.spaces > 6) {
+				xloc = random.nextInt(MinesweeperX.horiz);
+				yloc = random.nextInt(MinesweeperX.vert);
+			}
+			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && yloc+1 == ylocation+1 &&
+					xloc-1 == xlocation-1 && yloc-1 == ylocation-1 && xloc+1 == xlocation+1 && yloc+1 == ylocation+1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && MinesweeperX.spaces > 7) {
+				xloc = random.nextInt(MinesweeperX.horiz);
+				yloc = random.nextInt(MinesweeperX.vert);
+			}
+			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && yloc+1 == ylocation+1 &&
+					xloc-1 == xlocation-1 && yloc-1 == ylocation-1 && xloc+1 == xlocation+1 && yloc+1 == ylocation+1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && xloc-1 == xlocation-1 && yloc+1 == ylocation+1 && MinesweeperX.spaces > 8) {
 				xloc = random.nextInt(MinesweeperX.horiz);
 				yloc = random.nextInt(MinesweeperX.vert);
 			}
@@ -314,7 +350,7 @@ public class Board {
 		}
 		return loc;
 	}
-	// MOST IMPORTANT PART/////////////////////////////////////////////////////
+	// MOST IMPORTANT PART
 	/**This method count number of mines around particular cell and set its value*/
 	public void setCellValues(){
 		// cells[i][j].incrementValue();
@@ -331,6 +367,14 @@ public class Board {
 					try { if(i>=1 && j<= yside && cells[i-1][j+1].getValue() == -1) { cells[i][j].incrementValue(); } } catch (IndexOutOfBoundsException xmax) {}
 					try { if(i<= xside && j>= 1 && cells[i+1][j-1].getValue() == -1) { cells[i][j].incrementValue(); } } catch (IndexOutOfBoundsException xmax) {}
 				}
+			}
+		}
+	}
+	
+	public void resetValues() {
+		for(int i = 0; i<xside; i++){
+			for(int j = 0; j<yside; j++){
+				cells[i][j].setValue(0);
 			}
 		}
 	}
@@ -394,16 +438,17 @@ public class Board {
 		try {if (!cells[x][y].getBtn().isEnabled()) {
 			if (cells[x][y].getValue() > 0) {
 				if (!cells[x][y].getBtn().getText().equals(cells[x][y].flagicon)) {
-					try { if (cells[x-1][y-1].isMine()) { nummines++; } if (cells[x-1][y-1].getBtn().getText().equals(cells[x-1][y-1].flagicon)) {numflag++;} } catch (IndexOutOfBoundsException xmax) {}
-					try { if (cells[x][y-1].isMine()) { nummines++; } if (cells[x][y-1].getBtn().getText().equals(cells[x][y-1].flagicon)) {numflag++;} } catch (IndexOutOfBoundsException xmax) {}
-					try { if (cells[x+1][y-1].isMine()) { nummines++; } if (cells[x+1][y-1].getBtn().getText().equals(cells[x+1][y-1].flagicon)) {numflag++;} } catch (IndexOutOfBoundsException xmax) {}
+					try { if (cells[x-1][y-1].isMine()) { nummines++; } if (cells[x-1][y-1].getBtn().getText().equals(cells[x-1][y-1].flagicon)) {numflag++;} } catch (ArrayIndexOutOfBoundsException xmax) {}
+					try { if (cells[x]  [y-1].isMine()) { nummines++; } if (cells[x]  [y-1].getBtn().getText().equals(cells[x]  [y-1].flagicon)) {numflag++;} } catch (ArrayIndexOutOfBoundsException xmax) {}
+					try { if (cells[x+1][y-1].isMine()) { nummines++; } if (cells[x+1][y-1].getBtn().getText().equals(cells[x+1][y-1].flagicon)) {numflag++;} } catch (ArrayIndexOutOfBoundsException xmax) {}
 					
-					try { if (cells[x-1][y].isMine()) { nummines++; } if (cells[x-1][y].getBtn().getText().equals(cells[x-1][y].flagicon)) {numflag++;} } catch (IndexOutOfBoundsException xmax) {}
-					try { if (cells[x+1][y].isMine()) { nummines++; } if (cells[x+1][y].getBtn().getText().equals(cells[x+1][y].flagicon)) {numflag++;} } catch (IndexOutOfBoundsException xmax) {}
+					try { if (cells[x-1][y].isMine()) { nummines++; } if (cells  [x-1][y].getBtn().getText().equals(cells  [x-1][y].flagicon)) {numflag++;} } catch (ArrayIndexOutOfBoundsException xmax) {}
+					try { if (cells[x]  [y].isMine()) { nummines++; } if (cells  [x]  [y].getBtn().getText().equals(cells  [x]  [y].flagicon)) {numflag++;} } catch (ArrayIndexOutOfBoundsException xmax) {}
+					try { if (cells[x+1][y].isMine()) { nummines++; } if (cells  [x+1][y].getBtn().getText().equals(cells  [x+1][y].flagicon)) {numflag++;} } catch (ArrayIndexOutOfBoundsException xmax) {}
 					
-					try { if (cells[x-1][y+1].isMine()) { nummines++; } if (cells[x-1][y+1].getBtn().getText().equals(cells[x-1][y+1].flagicon)) {numflag++;} } catch (IndexOutOfBoundsException xmax) {}
-					try { if (cells[x][y+1].isMine()) { nummines++; } if (cells[x][y+1].getBtn().getText().equals(cells[x][y+1].flagicon)) {numflag++;} } catch (IndexOutOfBoundsException xmax) {}
-					try { if (cells[x+1][y+1].isMine()) { nummines++; } if (cells[x+1][y+1].getBtn().getText().equals(cells[x+1][y+1].flagicon)) {numflag++;} } catch (IndexOutOfBoundsException xmax) {}
+					try { if (cells[x-1][y+1].isMine()) { nummines++; } if (cells[x-1][y+1].getBtn().getText().equals(cells[x-1][y+1].flagicon)) {numflag++;} } catch (ArrayIndexOutOfBoundsException xmax) {}
+					try { if (cells[x]  [y+1].isMine()) { nummines++; } if (cells[x]  [y+1].getBtn().getText().equals(cells[x]  [y+1].flagicon)) {numflag++;} } catch (ArrayIndexOutOfBoundsException xmax) {}
+					try { if (cells[x+1][y+1].isMine()) { nummines++; } if (cells[x+1][y+1].getBtn().getText().equals(cells[x+1][y+1].flagicon)) {numflag++;} } catch (ArrayIndexOutOfBoundsException xmax) {}
 				}
 			}
 		}
@@ -413,23 +458,73 @@ public class Board {
 		
 		// Reveal mode
 		// Left bar
-		try {if (!cells[x-1][y-1].getBtn().getText().equals("P") && !cells[x-1][y-1].getBtn().getText().equals("\u2691")) {cells[x-1][y-1].checkCell();}} catch (IndexOutOfBoundsException xmax) {}
-		try {if (!cells[x][y-1].getBtn().getText().equals("P") && !cells[x][y-1].getBtn().getText().equals("\u2691"))     {cells[x][y-1].checkCell();}} catch (IndexOutOfBoundsException xmax) {}
-		try {if (!cells[x+1][y-1].getBtn().getText().equals("P") && !cells[x+1][y-1].getBtn().getText().equals("\u2691")) {cells[x+1][y-1].checkCell();}} catch (IndexOutOfBoundsException xmax) {}
+		try {if (!cells[x-1][y-1].mineflag) {
+			while (cells[x-1][y-1].getBtn().isEnabled()) cells[x-1][y-1].checkCell();}
+		} catch (IndexOutOfBoundsException xmax) {}
+		
+		try {if (!cells[x][y-1].mineflag)     {
+			while (cells[x][y-1].getBtn().isEnabled()) cells[x][y-1].checkCell();}
+		} catch (IndexOutOfBoundsException xmax) {}
+		
+		try {if (!cells[x+1][y-1].mineflag) {
+			while (cells[x+1][y-1].getBtn().isEnabled()) cells[x+1][y-1].checkCell();}
+		} catch (IndexOutOfBoundsException xmax) {}
 		
 		// Center bar
-		try {if (!cells[x-1][y].getBtn().getText().equals("P") && !cells[x-1][y].getBtn().getText().equals("\u2691")) {cells[x-1][y].checkCell();}} catch (IndexOutOfBoundsException xmax) {}
-		//try {if (!cells[x][y].getBtn().getText().equals("P") && !cells[x][y].getBtn().getText().equals("\u2691"))   {cells[x][y].checkCell();}} catch (IndexOutOfBoundsException xmax) {}
-		try {if (!cells[x+1][y].getBtn().getText().equals("P") && !cells[x+1][y].getBtn().getText().equals("\u2691")) {cells[x+1][y].checkCell();}} catch (IndexOutOfBoundsException xmax) {}
+		try {if (!cells[x-1][y].mineflag) {
+			while (cells[x-1][y].getBtn().isEnabled()) cells[x-1][y].checkCell();}
+		} catch (IndexOutOfBoundsException xmax) {}
+		
+		try {if (!cells[x+1][y].mineflag) {
+			while (cells[x+1][y].getBtn().isEnabled()) cells[x+1][y].checkCell();}
+		} catch (IndexOutOfBoundsException xmax) {}
 		
 		// Right bar
-		try {if (!cells[x+1][y+1].getBtn().getText().equals("P") && !cells[x-1][y+1].getBtn().getText().equals("\u2691")) {cells[x-1][y+1].checkCell();}} catch (IndexOutOfBoundsException xmax) {}
-		try {if (!cells[x][y+1].getBtn().getText().equals("P") && !cells[x][y+1].getBtn().getText().equals("\u2691"))     {cells[x][y+1].checkCell();}} catch (IndexOutOfBoundsException xmax) {}
-		try {if (!cells[x-1][y+1].getBtn().getText().equals("P") && !cells[x+1][y+1].getBtn().getText().equals("\u2691")) {cells[x+1][y+1].checkCell();}} catch (IndexOutOfBoundsException xmax) {}
+		try {if (!cells[x-1][y+1].mineflag) {
+			while (cells[x-1][y+1].getBtn().isEnabled()) cells[x-1][y+1].checkCell();}
+		} catch (IndexOutOfBoundsException xmax) {}
+		
+		try {if (!cells[x][y+1].mineflag)     {
+			while (cells[x][y+1].getBtn().isEnabled()) cells[x][y+1].checkCell();}
+		} catch (IndexOutOfBoundsException xmax) {}
+		
+		try {if (!cells[x+1][y+1].mineflag) {
+			while (cells[x+1][y+1].getBtn().isEnabled()) cells[x+1][y+1].checkCell();}
+		} catch (IndexOutOfBoundsException xmax) {}
 		
 		return true;
 	}
-	//////////////////////////////////////////////////////////////////////////////////
+	
+	/**Move some mines by clicking some spaces
+	 */
+	public void moveMines(int x, int y) {
+		try {if (cells[x][y].isMine()) {move(x, y);}} catch (IndexOutOfBoundsException xmax) {}
+		try {if (cells[x-1][y-1].isMine() && MinesweeperX.spaces > 1) move(x-1, y-1);} catch (IndexOutOfBoundsException xmax) {}
+		try {if (cells[x+1][y+1].isMine() && MinesweeperX.spaces > 2) move(x+1, y+1);} catch (IndexOutOfBoundsException xmax) {}
+		try {if (cells[x-1][y+1].isMine() && MinesweeperX.spaces > 3) move(x-1, y+1);} catch (IndexOutOfBoundsException xmax) {}
+		try {if (cells[x+1][y-1].isMine() && MinesweeperX.spaces > 4) move(x+1, y-1);} catch (IndexOutOfBoundsException xmax) {}
+		try {if (cells[x+1][y].isMine() && MinesweeperX.spaces > 5) move(x+1, y);} catch (IndexOutOfBoundsException xmax) {}
+		try {if (cells[x-1][y].isMine() && MinesweeperX.spaces > 6) move(x-1, y);} catch (IndexOutOfBoundsException xmax) {}
+		try {if (cells[x][y+1].isMine() && MinesweeperX.spaces > 7) move(x, y+1);} catch (IndexOutOfBoundsException xmax) {}
+		try {if (cells[x][y-1].isMine() && MinesweeperX.spaces > 8) move(x, y-1);} catch (IndexOutOfBoundsException xmax) {}
+	}
+	
+	private void move(int x, int y) {
+		cells[x][y].removeMine();
+		
+		Random r = new Random();
+		
+		int xnew = r.nextInt(MinesweeperX.vert);
+		int ynew = r.nextInt(MinesweeperX.horiz);
+		
+		while (xnew == x && ynew == y) {
+			xnew = r.nextInt(MinesweeperX.vert);
+			ynew = r.nextInt(MinesweeperX.horiz);
+		}
+		
+		cells[xnew][ynew].setMine();
+	}
+	
 	public int getID(){
 		int id = cellID;
 		cellID++;
@@ -440,7 +535,6 @@ public class Board {
 		for(Cell[] a : cells){
 			for(Cell b : a){
 				if(b.getID() == id) return b;
-
 			}
 		}
 		return null;
@@ -532,11 +626,6 @@ public class Board {
 	private void init() {
 		allowMulticlick = false;
 		doOnceStatus = true;
-		
-		if (!EDITOR_MODE) {
-			plantMines();
-			//setCellValues();
-		}
 	}
 	
 	public boolean isDone() {
