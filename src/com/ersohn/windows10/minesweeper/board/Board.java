@@ -38,7 +38,6 @@ public class Board {
 	private JTextField custom;
 	
 	public Cell[][] cells;
-	private int cellID = 0;
 	private int xside = (MinesweeperX.horiz);
 	private int yside = (MinesweeperX.vert);
 	
@@ -286,10 +285,10 @@ public class Board {
 			int newYLocation = random.nextInt(MinesweeperX.vert);
 			
 			// Horizontal and verticals
-			while ((newYLocation-1 == ylocation-1 && newYLocation+1 == ylocation+1) && newXLocation-1 == xlocation-1 && MinesweeperX.spaces > 1) {
+			while (newXLocation-1 == xlocation-1 && newYLocation == ylocation && MinesweeperX.spaces > 1) {
 				newXLocation = random.nextInt(MinesweeperX.horiz);
 			}
-			while ((newYLocation-1 == ylocation-1 && newYLocation+1 == ylocation+1) && (newXLocation-1 == xlocation-1 && newXLocation+1 == xlocation+1) && MinesweeperX.spaces > 2) {
+			while ((newXLocation-1 == xlocation-1 && newXLocation+1 == xlocation+1) && newYLocation == ylocation && MinesweeperX.spaces > 2) {
 				newXLocation = random.nextInt(MinesweeperX.horiz);
 			}
 			while ((newXLocation-1 == xlocation-1 && newXLocation+1 == xlocation+1) && newYLocation-1 == ylocation-1 && MinesweeperX.spaces > 3) {
@@ -443,7 +442,7 @@ public class Board {
 			while (cells[x-1][y-1].isChecked()) cells[x-1][y-1].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
-		try {if (!cells[x][y-1].mineflag)     {
+		try {if (!cells[x][y-1].mineflag) {
 			while (cells[x][y-1].isChecked()) cells[x][y-1].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
@@ -465,7 +464,7 @@ public class Board {
 			while (cells[x-1][y+1].isChecked()) cells[x-1][y+1].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
-		try {if (!cells[x][y+1].mineflag)     {
+		try {if (!cells[x][y+1].mineflag) {
 			while (cells[x][y+1].isChecked()) cells[x][y+1].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
@@ -474,51 +473,6 @@ public class Board {
 		} catch (IndexOutOfBoundsException xmax) {}
 		
 		return true;
-	}
-	
-	/**Move some mines by clicking some spaces
-	 */
-	public void moveMines(int x, int y) {
-		try {if (cells[x][y].isMine()) {move(x, y);}} catch (IndexOutOfBoundsException xmax) {}
-		try {if (cells[x-1][y-1].isMine() && MinesweeperX.spaces > 1) move(x-1, y-1);} catch (IndexOutOfBoundsException xmax) {}
-		try {if (cells[x+1][y+1].isMine() && MinesweeperX.spaces > 2) move(x+1, y+1);} catch (IndexOutOfBoundsException xmax) {}
-		try {if (cells[x-1][y+1].isMine() && MinesweeperX.spaces > 3) move(x-1, y+1);} catch (IndexOutOfBoundsException xmax) {}
-		try {if (cells[x+1][y-1].isMine() && MinesweeperX.spaces > 4) move(x+1, y-1);} catch (IndexOutOfBoundsException xmax) {}
-		try {if (cells[x+1][y].isMine() && MinesweeperX.spaces > 5) move(x+1, y);} catch (IndexOutOfBoundsException xmax) {}
-		try {if (cells[x-1][y].isMine() && MinesweeperX.spaces > 6) move(x-1, y);} catch (IndexOutOfBoundsException xmax) {}
-		try {if (cells[x][y+1].isMine() && MinesweeperX.spaces > 7) move(x, y+1);} catch (IndexOutOfBoundsException xmax) {}
-		try {if (cells[x][y-1].isMine() && MinesweeperX.spaces > 8) move(x, y-1);} catch (IndexOutOfBoundsException xmax) {}
-	}
-	
-	private void move(int x, int y) {
-		cells[x][y].removeMine();
-		
-		Random r = new Random();
-		
-		int xnew = r.nextInt(MinesweeperX.vert);
-		int ynew = r.nextInt(MinesweeperX.horiz);
-		
-		while (xnew == x && ynew == y) {
-			xnew = r.nextInt(MinesweeperX.vert);
-			ynew = r.nextInt(MinesweeperX.horiz);
-		}
-		
-		cells[xnew][ynew].setMine();
-	}
-	
-	public int getID(){
-		int id = cellID;
-		cellID++;
-		return id;
-	}
-
-	public Cell getCell(int id){
-		for(Cell[] a : cells){
-			for(Cell b : a){
-				if(b.getID() == id) return b;
-			}
-		}
-		return null;
 	}
 	
 	public void explosion(){
