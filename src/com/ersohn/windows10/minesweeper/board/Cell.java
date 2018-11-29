@@ -65,7 +65,7 @@ public class Cell implements ActionListener {
 		btn.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if (arg0.getButton() == MouseEvent.BUTTON3 && /*(!MinesweeperX.challengetype.equals("lmb") || MinesweeperX.challengetype.equals("rmb")) &&*/ !brd.timestop) {
+				if (arg0.getButton() == MouseEvent.BUTTON3 && ready && !brd.timestop) {
 					if (brd.status == Status.NONE) {
 						if (mineflag) {
 							MinesweeperX.changeamount(1);
@@ -85,7 +85,7 @@ public class Cell implements ActionListener {
 					}
 					
 					multipleclick = false;
-				} else if (arg0.getButton() == MouseEvent.BUTTON2 /*&& (!MinesweeperX.challengetype.equals("lmb"))*/) {
+				} else if (arg0.getButton() == MouseEvent.BUTTON2 && !ready) {
 					radararea = false;
 					if (brd.allowMulticlick)
 						multiclick(ylocation, xlocation);
@@ -94,7 +94,7 @@ public class Cell implements ActionListener {
 					if (btn.getText().equals(flagicon) && !radararea) {
 						checkCell();
 					}
-					if (multipleclick && !MinesweeperX.challengetype.equals("lmb")) {
+					if (multipleclick && !MinesweeperX.challengetype.equals("lmb") && !ready) {
 						if (checkForSpaces()) {
 							if (brd.allowMulticlick)
 								multiclick(ylocation, xlocation);
@@ -280,7 +280,6 @@ public class Cell implements ActionListener {
 	public void reveal(Color c) {
 		displayValue(c);
 		ready = false;
-		//btn.setEnabled(false);
 	}
 	
 	@Override
@@ -298,13 +297,6 @@ public class Cell implements ActionListener {
 					checkCell();
 			}
 			else {
-				if (value == 0) {
-					/*if (MinesweeperX.getSound) {
-						snd = new SoundEffect("openspaces.wav");
-						if (value == 0) snd.run();
-					}*/
-				}
-				
 				checkCell();
 			}
 		}
