@@ -131,6 +131,12 @@ public class Board {
 			IntStream.range(0, yside).forEach(j -> cells[i][j] = new Cell(this));
 		});
 		
+		for(int i = 0; i<xside; i++){
+			for(int j = 0; j<yside; j++){
+				cells[i][j].setLocation(j, i);
+			}
+		}
+		
 		if (!editor) {
 			init();
 		}
@@ -276,54 +282,46 @@ public class Board {
 		Random random = new Random();
 		int counter = 0;
 		while (counter != MINES) {
-			int xloc = random.nextInt(MinesweeperX.horiz);
-			int yloc = random.nextInt(MinesweeperX.vert);
-			
-			while (cells[xloc][yloc].isMine()) {
-				xloc = random.nextInt(MinesweeperX.horiz);
-				yloc = random.nextInt(MinesweeperX.vert);
-			}
+			int newXLocation = random.nextInt(MinesweeperX.horiz);
+			int newYLocation = random.nextInt(MinesweeperX.vert);
 			
 			// Horizontal and verticals
-			while (xloc-1 == xlocation-1 && MinesweeperX.spaces > 1) {
-				xloc = random.nextInt(MinesweeperX.horiz);
-				yloc = random.nextInt(MinesweeperX.vert);
+			while ((newYLocation-1 == ylocation-1 && newYLocation+1 == ylocation+1) && newXLocation-1 == xlocation-1 && MinesweeperX.spaces > 1) {
+				newXLocation = random.nextInt(MinesweeperX.horiz);
 			}
-			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && MinesweeperX.spaces > 2) {
-				xloc = random.nextInt(MinesweeperX.horiz);
-				yloc = random.nextInt(MinesweeperX.vert);
+			while ((newYLocation-1 == ylocation-1 && newYLocation+1 == ylocation+1) && (newXLocation-1 == xlocation-1 && newXLocation+1 == xlocation+1) && MinesweeperX.spaces > 2) {
+				newXLocation = random.nextInt(MinesweeperX.horiz);
 			}
-			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && MinesweeperX.spaces > 3) {
-				xloc = random.nextInt(MinesweeperX.horiz);
-				yloc = random.nextInt(MinesweeperX.vert);
+			while ((newXLocation-1 == xlocation-1 && newXLocation+1 == xlocation+1) && newYLocation-1 == ylocation-1 && MinesweeperX.spaces > 3) {
+				newYLocation = random.nextInt(MinesweeperX.vert);
 			}
-			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && yloc+1 == ylocation+1 && MinesweeperX.spaces > 4) {
-				xloc = random.nextInt(MinesweeperX.horiz);
-				yloc = random.nextInt(MinesweeperX.vert);
+			while ((newXLocation-1 == xlocation-1 && newXLocation+1 == xlocation+1) && (newYLocation-1 == ylocation-1 && newYLocation+1 == ylocation+1) && MinesweeperX.spaces > 4) {
+				newYLocation = random.nextInt(MinesweeperX.vert);
 			}
 			
-			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && yloc+1 == ylocation+1 &&
-					xloc-1 == xlocation-1 && yloc-1 == ylocation-1 && MinesweeperX.spaces > 5) {
-				xloc = random.nextInt(MinesweeperX.horiz);
-				yloc = random.nextInt(MinesweeperX.vert);
+			// Diagonals
+			while ((newXLocation-1 == xlocation-1 && newXLocation+1 == xlocation+1) && (newYLocation-1 == ylocation-1 && newYLocation+1 == ylocation+1) &&
+					(newXLocation-1 == xlocation-1 && newYLocation-1 == ylocation-1) && MinesweeperX.spaces > 5) {
+				newXLocation = random.nextInt(MinesweeperX.horiz);
+				newYLocation = random.nextInt(MinesweeperX.vert);
 			}
-			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && yloc+1 == ylocation+1 &&
-					xloc-1 == xlocation-1 && yloc-1 == ylocation-1 && xloc+1 == xlocation+1 && yloc+1 == ylocation+1 && MinesweeperX.spaces > 6) {
-				xloc = random.nextInt(MinesweeperX.horiz);
-				yloc = random.nextInt(MinesweeperX.vert);
+			while ((newXLocation-1 == xlocation-1 && newXLocation+1 == xlocation+1) && (newYLocation-1 == ylocation-1 && newYLocation+1 == ylocation+1) &&
+					(newXLocation-1 == xlocation-1 && newYLocation-1 == ylocation-1) && (newXLocation+1 == xlocation+1 && newYLocation+1 == ylocation+1) && MinesweeperX.spaces > 6) {
+				newXLocation = random.nextInt(MinesweeperX.horiz);
+				newYLocation = random.nextInt(MinesweeperX.vert);
 			}
-			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && yloc+1 == ylocation+1 &&
-					xloc-1 == xlocation-1 && yloc-1 == ylocation-1 && xloc+1 == xlocation+1 && yloc+1 == ylocation+1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && MinesweeperX.spaces > 7) {
-				xloc = random.nextInt(MinesweeperX.horiz);
-				yloc = random.nextInt(MinesweeperX.vert);
+			while ((newXLocation-1 == xlocation-1 && newXLocation+1 == xlocation+1) && (newYLocation-1 == ylocation-1 && newYLocation+1 == ylocation+1) &&
+					(newXLocation-1 == xlocation-1 && newYLocation-1 == ylocation-1) && (newXLocation+1 == xlocation+1 && newYLocation+1 == ylocation+1) && (newXLocation+1 == xlocation+1 && newYLocation-1 == ylocation-1) && MinesweeperX.spaces > 7) {
+				newXLocation = random.nextInt(MinesweeperX.horiz);
+				newYLocation = random.nextInt(MinesweeperX.vert);
 			}
-			while (xloc-1 == xlocation-1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && yloc+1 == ylocation+1 &&
-					xloc-1 == xlocation-1 && yloc-1 == ylocation-1 && xloc+1 == xlocation+1 && yloc+1 == ylocation+1 && xloc+1 == xlocation+1 && yloc-1 == ylocation-1 && xloc-1 == xlocation-1 && yloc+1 == ylocation+1 && MinesweeperX.spaces > 8) {
-				xloc = random.nextInt(MinesweeperX.horiz);
-				yloc = random.nextInt(MinesweeperX.vert);
+			while ((newXLocation-1 == xlocation-1 && newXLocation+1 == xlocation+1) && (newYLocation-1 == ylocation-1 && newYLocation+1 == ylocation+1) &&
+					(newXLocation-1 == xlocation-1 && newYLocation-1 == ylocation-1) && (newXLocation+1 == xlocation+1 && newYLocation+1 == ylocation+1) && (newXLocation+1 == xlocation+1 && newYLocation-1 == ylocation-1) && (newXLocation-1 == xlocation-1 && newYLocation+1 == ylocation+1) && MinesweeperX.spaces > 8) {
+				newXLocation = random.nextInt(MinesweeperX.horiz);
+				newYLocation = random.nextInt(MinesweeperX.vert);
 			}
 			
-			counter += cells[xloc][yloc].setMine();
+			counter += cells[newXLocation][newYLocation].setMine();
 		}
 		MinesweeperX.spaces = (MinesweeperX.horiz * MinesweeperX.vert - counter);
 	}
@@ -356,7 +354,6 @@ public class Board {
 		// cells[i][j].incrementValue();
 		for(int i = 0; i<xside; i++){
 			for(int j = 0; j<yside; j++){
-				cells[i][j].setLocation(j, i);
 				if(cells[i][j].getValue() != -1){
 					try { if(j>=1 && cells[i][j-1].getValue() == -1) { cells[i][j].incrementValue(); } } catch (IndexOutOfBoundsException xmax) {}
 					try { if(j<= yside && cells[i][j+1].getValue() == -1) { cells[i][j].incrementValue(); } } catch (IndexOutOfBoundsException xmax) {}
@@ -386,44 +383,28 @@ public class Board {
 	public void scanForEmptyCells(int y, int x){
 		try {
 			while (cells[x-1][y-1].isChecked()) cells[x-1][y-1].openLotSpaces();
-		} catch (IndexOutOfBoundsException xmax) {
-			//xmax.printStackTrace();
-		}
+		} catch (IndexOutOfBoundsException xmax) {}
 		try {
 			while (cells[x][y-1].isChecked()) cells[x][y-1].openLotSpaces();
-		} catch (IndexOutOfBoundsException xmax) {
-			//xmax.printStackTrace();
-		}
+		} catch (IndexOutOfBoundsException xmax) {}
 		try {
 			while (cells[x+1][y-1].isChecked()) cells[x+1][y-1].openLotSpaces();
-		} catch (IndexOutOfBoundsException xmax) {
-			//xmax.printStackTrace();
-		}
+		} catch (IndexOutOfBoundsException xmax) {}
 		try {
 			while (cells[x-1][y+1].isChecked()) cells[x-1][y+1].openLotSpaces();
-		} catch (IndexOutOfBoundsException xmax) {
-			//xmax.printStackTrace();
-		}
+		} catch (IndexOutOfBoundsException xmax) {}
 		try {
 			while (cells[x][y+1].isChecked()) cells[x][y+1].openLotSpaces();
-		} catch (IndexOutOfBoundsException xmax) {
-			//xmax.printStackTrace();
-		}
+		} catch (IndexOutOfBoundsException xmax) {}
 		try {
 			while (cells[x+1][y+1].isChecked()) cells[x+1][y+1].openLotSpaces();
-		} catch (IndexOutOfBoundsException xmax) {
-			//xmax.printStackTrace();
-		}
+		} catch (IndexOutOfBoundsException xmax) {}
 		try {
 			while (cells[x-1][y].isChecked()) cells[x-1][y].openLotSpaces();
-		} catch (IndexOutOfBoundsException xmax) {
-			//xmax.printStackTrace();
-		}
+		} catch (IndexOutOfBoundsException xmax) {}
 		try {
 			while (cells[x+1][y].isChecked()) cells[x+1][y].openLotSpaces();
-		} catch (IndexOutOfBoundsException xmax) {
-			//xmax.printStackTrace();
-		}
+		} catch (IndexOutOfBoundsException xmax) {}
 	}
 	
 	/**Multiclick is impressive, but may only use by Detector.
