@@ -8,6 +8,8 @@ import javax.swing.JButton;
 import com.ersohn.windows10.minesweeper.*;
 
 public class Cell implements ActionListener {
+	private Color[] numcolors = {null, Color.BLUE, Color.GREEN, Color.RED, Color.PINK, Color.MAGENTA, Color.CYAN, Color.BLACK, Color.GRAY};
+	
 	public int xlocation;
 	public int ylocation;
 	
@@ -67,11 +69,15 @@ public class Cell implements ActionListener {
 					if (brd.status == Status.NONE) {
 						if (mineflag) {
 							MinesweeperX.changeamount(1);
+							btn.setForeground(null);
+							btn.setBackground(null);
 							btn.setText("");
 							mineflag = false;
 						} else {
 							if (btn.isEnabled()) {
 								MinesweeperX.changeamount(-1);
+								btn.setForeground(Color.RED);
+								btn.setBackground(Color.YELLOW);
 								btn.setText(flagicon);
 								mineflag = true;
 							}
@@ -162,14 +168,15 @@ public class Cell implements ActionListener {
 	}
 	
 	public void displayValue(Color c) {
+		if (!isMine())
+			btn.setForeground(numcolors[value]);
+			btn.setBackground(Color.WHITE);
 		if (isMine()) {
 			if (!btn.getText().equals("P") && !btn.getText().equals("\u2691")) {
 				btn.setText("\u2600");
 				btn.setBackground(c);
 			} else if (isMine()) {
 				btn.setBackground(Color.GREEN);
-			} else {
-				btn.setBackground(Color.YELLOW);
 			}
 		} else if(value!=0) {
 			for (int i = 0; i < 1000; i++) {
@@ -190,7 +197,7 @@ public class Cell implements ActionListener {
 	public void checkCell() {
 		if (getBtn().getText().equals(flagicon)) return;
 		
-		if (btn.isEnabled()) {
+		if (ready) {
 			brd.getsFirst = false;
 			
 			if (MinesweeperX.spaces < 0) {
@@ -200,8 +207,6 @@ public class Cell implements ActionListener {
 			if (brd.timestop && !brd.EDITOR_MODE) {
 				int totalattempt = 0;
 				boolean doThis = value != 0 || isMine() && MinesweeperX.spaces > 7;
-				//brd.moveMines(xlocation, ylocation);
-				//brd.resetValues();
 				brd.plantMines(xlocation, ylocation);
 				brd.setCellValues();
 				while (doThis || value != 0 && totalattempt < 100000) {
@@ -275,7 +280,7 @@ public class Cell implements ActionListener {
 	public void reveal(Color c) {
 		displayValue(c);
 		ready = false;
-		btn.setEnabled(false);
+		//btn.setEnabled(false);
 	}
 	
 	@Override
@@ -334,6 +339,7 @@ public class Cell implements ActionListener {
 		
 		setValue(0);
 		btn.setText("");
+		btn.setForeground(null);
 		btn.setBackground(null);
 		ready = true;
 		btn.setEnabled(ready);
