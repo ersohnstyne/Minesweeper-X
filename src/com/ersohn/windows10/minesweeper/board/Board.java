@@ -385,42 +385,42 @@ public class Board {
 	 */
 	public void scanForEmptyCells(int y, int x){
 		try {
-			while (cells[x-1][y-1].getBtn().isEnabled()) cells[x-1][y-1].openLotSpaces();
+			while (cells[x-1][y-1].isChecked()) cells[x-1][y-1].openLotSpaces();
 		} catch (IndexOutOfBoundsException xmax) {
 			//xmax.printStackTrace();
 		}
 		try {
-			while (cells[x][y-1].getBtn().isEnabled()) cells[x][y-1].openLotSpaces();
+			while (cells[x][y-1].isChecked()) cells[x][y-1].openLotSpaces();
 		} catch (IndexOutOfBoundsException xmax) {
 			//xmax.printStackTrace();
 		}
 		try {
-			while (cells[x+1][y-1].getBtn().isEnabled()) cells[x+1][y-1].openLotSpaces();
+			while (cells[x+1][y-1].isChecked()) cells[x+1][y-1].openLotSpaces();
 		} catch (IndexOutOfBoundsException xmax) {
 			//xmax.printStackTrace();
 		}
 		try {
-			while (cells[x-1][y+1].getBtn().isEnabled()) cells[x-1][y+1].openLotSpaces();
+			while (cells[x-1][y+1].isChecked()) cells[x-1][y+1].openLotSpaces();
 		} catch (IndexOutOfBoundsException xmax) {
 			//xmax.printStackTrace();
 		}
 		try {
-			while (cells[x][y+1].getBtn().isEnabled()) cells[x][y+1].openLotSpaces();
+			while (cells[x][y+1].isChecked()) cells[x][y+1].openLotSpaces();
 		} catch (IndexOutOfBoundsException xmax) {
 			//xmax.printStackTrace();
 		}
 		try {
-			while (cells[x+1][y+1].getBtn().isEnabled()) cells[x+1][y+1].openLotSpaces();
+			while (cells[x+1][y+1].isChecked()) cells[x+1][y+1].openLotSpaces();
 		} catch (IndexOutOfBoundsException xmax) {
 			//xmax.printStackTrace();
 		}
 		try {
-			while (cells[x-1][y].getBtn().isEnabled()) cells[x-1][y].openLotSpaces();
+			while (cells[x-1][y].isChecked()) cells[x-1][y].openLotSpaces();
 		} catch (IndexOutOfBoundsException xmax) {
 			//xmax.printStackTrace();
 		}
 		try {
-			while (cells[x+1][y].getBtn().isEnabled()) cells[x+1][y].openLotSpaces();
+			while (cells[x+1][y].isChecked()) cells[x+1][y].openLotSpaces();
 		} catch (IndexOutOfBoundsException xmax) {
 			//xmax.printStackTrace();
 		}
@@ -429,13 +429,13 @@ public class Board {
 	/**Multiclick is impressive, but may only use by Detector.
 	 */
 	public boolean multiclick(int x, int y) {
-		if (cells[x][y].getBtn().isEnabled()) return false;
+		if (cells[x][y].isChecked()) return false;
 		
 		int numflag = 0;
 		int nummines = 0;
 		
 		// Radar mode
-		try {if (!cells[x][y].getBtn().isEnabled()) {
+		try {if (!cells[x][y].isChecked()) {
 			if (cells[x][y].getValue() > 0) {
 				if (!cells[x][y].getBtn().getText().equals(cells[x][y].flagicon)) {
 					try { if (cells[x-1][y-1].isMine()) { nummines++; } if (cells[x-1][y-1].getBtn().getText().equals(cells[x-1][y-1].flagicon)) {numflag++;} } catch (ArrayIndexOutOfBoundsException xmax) {}
@@ -459,37 +459,37 @@ public class Board {
 		// Reveal mode
 		// Left bar
 		try {if (!cells[x-1][y-1].mineflag) {
-			while (cells[x-1][y-1].getBtn().isEnabled()) cells[x-1][y-1].checkCell();}
+			while (cells[x-1][y-1].isChecked()) cells[x-1][y-1].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
 		try {if (!cells[x][y-1].mineflag)     {
-			while (cells[x][y-1].getBtn().isEnabled()) cells[x][y-1].checkCell();}
+			while (cells[x][y-1].isChecked()) cells[x][y-1].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
 		try {if (!cells[x+1][y-1].mineflag) {
-			while (cells[x+1][y-1].getBtn().isEnabled()) cells[x+1][y-1].checkCell();}
+			while (cells[x+1][y-1].isChecked()) cells[x+1][y-1].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
 		// Center bar
 		try {if (!cells[x-1][y].mineflag) {
-			while (cells[x-1][y].getBtn().isEnabled()) cells[x-1][y].checkCell();}
+			while (cells[x-1][y].isChecked()) cells[x-1][y].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
 		try {if (!cells[x+1][y].mineflag) {
-			while (cells[x+1][y].getBtn().isEnabled()) cells[x+1][y].checkCell();}
+			while (cells[x+1][y].isChecked()) cells[x+1][y].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
 		// Right bar
 		try {if (!cells[x-1][y+1].mineflag) {
-			while (cells[x-1][y+1].getBtn().isEnabled()) cells[x-1][y+1].checkCell();}
+			while (cells[x-1][y+1].isChecked()) cells[x-1][y+1].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
 		try {if (!cells[x][y+1].mineflag)     {
-			while (cells[x][y+1].getBtn().isEnabled()) cells[x][y+1].checkCell();}
+			while (cells[x][y+1].isChecked()) cells[x][y+1].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
 		try {if (!cells[x+1][y+1].mineflag) {
-			while (cells[x+1][y+1].getBtn().isEnabled()) cells[x+1][y+1].checkCell();}
+			while (cells[x+1][y+1].isChecked()) cells[x+1][y+1].checkCell();}
 		} catch (IndexOutOfBoundsException xmax) {}
 		
 		return true;
