@@ -18,7 +18,7 @@ public class Cell implements ActionListener {
 	
 	private JButton btn;
 	private Board brd;
-	private boolean ready;
+	private boolean covered;
 	private int value;
 	private int id;
 	
@@ -57,7 +57,7 @@ public class Cell implements ActionListener {
 	
 	public Cell(Board b) {
 		btn = new JButton(); 
-		ready = true;
+		covered = true;
 		
 		multipleclick = false;
 		
@@ -65,7 +65,7 @@ public class Cell implements ActionListener {
 		btn.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if (arg0.getButton() == MouseEvent.BUTTON3 && ready && !brd.timestop) {
+				if (arg0.getButton() == MouseEvent.BUTTON3 && covered && !brd.timestop) {
 					if (brd.status == Status.NONE) {
 						if (mineflag) {
 							MinesweeperX.changeamount(1);
@@ -85,7 +85,7 @@ public class Cell implements ActionListener {
 					}
 					
 					multipleclick = false;
-				} else if (arg0.getButton() == MouseEvent.BUTTON2 && !ready) {
+				} else if (arg0.getButton() == MouseEvent.BUTTON2 && !covered) {
 					radararea = false;
 					if (brd.allowMulticlick)
 						multiclick(ylocation, xlocation);
@@ -94,7 +94,7 @@ public class Cell implements ActionListener {
 					if (btn.getText().equals(flagicon) && !radararea) {
 						checkCell();
 					}
-					if (multipleclick && !MinesweeperX.challengetype.equals("lmb") && !ready) {
+					if (multipleclick && !MinesweeperX.challengetype.equals("lmb") && !covered) {
 						if (checkForSpaces()) {
 							if (brd.allowMulticlick)
 								multiclick(ylocation, xlocation);
@@ -197,7 +197,7 @@ public class Cell implements ActionListener {
 	public void checkCell() {
 		if (getBtn().getText().equals(flagicon)) return;
 		
-		if (ready) {
+		if (covered) {
 			brd.getsFirst = false;
 			
 			if (MinesweeperX.spaces < 0) {
@@ -209,7 +209,7 @@ public class Cell implements ActionListener {
 				boolean doThis = value != 0 || isMine() && MinesweeperX.spaces > 7;
 				brd.plantMines(xlocation, ylocation);
 				brd.setCellValues();
-				while (doThis || value != 0 && totalattempt < 100000) {
+				while ((doThis || value != 0) && totalattempt < 1000) {
 					brd.reset();
 					brd.plantMines(xlocation, ylocation);
 					brd.setCellValues();
@@ -270,7 +270,7 @@ public class Cell implements ActionListener {
 	}
 	
 	public boolean isChecked(){
-		return ready;
+		return covered;
 	}
 	
 	public boolean isEmpty(){
@@ -279,7 +279,7 @@ public class Cell implements ActionListener {
 	
 	public void reveal(Color c) {
 		displayValue(c);
-		ready = false;
+		covered = false;
 	}
 	
 	@Override
@@ -333,7 +333,7 @@ public class Cell implements ActionListener {
 		btn.setText("");
 		btn.setForeground(null);
 		btn.setBackground(null);
-		ready = true;
-		btn.setEnabled(ready);
+		covered = true;
+		btn.setEnabled(covered);
 	}
 }
