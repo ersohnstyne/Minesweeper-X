@@ -47,14 +47,6 @@ public class Cell implements ActionListener {
 		this.ylocation = y;
 	}
 	
-	public int getLocation(String c) {
-		switch (c) {
-			case "x": return xlocation;
-			case "y": return ylocation;
-			default: return 0;
-		}
-	}
-	
 	public Cell(Board b) {
 		btn = new JButton(); 
 		covered = true;
@@ -155,16 +147,8 @@ public class Cell implements ActionListener {
 		return value;
 	}
 	
-	public int getID() {
-		return id;
-	}
-	
 	public void setValue(int value) {
 		this.value = value;
-	}
-	
-	public void setID(int id) {
-		this.id = id;
 	}
 	
 	public void displayValue(Color c) {
@@ -309,12 +293,6 @@ public class Cell implements ActionListener {
 			return 1;
 		}
 		return 0;
-	}
-	
-	public void removeMine() {
-		if (isMine()) {
-			setValue(0);
-		}
 	}
 	
 	public boolean isMine() {
